@@ -2,13 +2,21 @@
 
 import React, { useState } from 'react';
 import { useShipments } from '@/context/ShipmentContext';
+import { useAuth } from '@/context/AuthContext';
 import { formatWeight, formatCapacity } from '@/lib/utils';
-import { Zap, Search, Plus, Filter, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { Zap, Search, Plus, Filter, ShieldCheck, CheckCircle2, Pencil, Trash2 } from 'lucide-react';
+import { Transformer } from '@/types';
+import { TransformerModal } from '@/components/modals/TransformerModal';
 
 export default function TransformersPage() {
-  const { transformers, shipments } = useShipments();
+  const { transformers, shipments, deleteTransformer } = useShipments();
+  const { isSuperAdmin, isMarketing } = useAuth();
   const [search, setSearch] = useState('');
   const [capacityFilter, setCapacityFilter] = useState('ALL');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTransformer, setSelectedTransformer] = useState<Transformer | null>(null);
+
+  const canManage = isSuperAdmin || isMarketing;
 
   const filtered = transformers.filter((t) => {
     const matchesSearch =
@@ -21,6 +29,28 @@ export default function TransformersPage() {
 
     return matchesSearch && matchesCap;
   });
+
+  const handleCreate = () => {
+    setSelectedTransformer(null);
+    setIsModalOpen(true);
+  };
+
+  const handleEdit = (transformer: Transformer) => {
+    setSelectedTransformer(transformer);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = (transformer: Transformer) => {
+    const isUnderShipment = shipments.some((s) => s.transformerId === transformer.id);
+    if (isUnderShipment) {
+      alert(`Transformer ${transformer.transformerNumber} sedang terikat pada shipment aktif dan tidak dapat dihapus!`);
+      return;
+    }
+
+    if (confirm(`Apakah Anda yakin ingin menghapus data transformer "${transformer.transformerNumber}" (${transformer.serialNumber})?`)) {
+      deleteTransformer(transformer.id);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -35,6 +65,16 @@ export default function TransformersPage() {
             Database spesifikasi teknis trafo: kapasitas 500 kVA s/d 3000 kVA, serial number, berat kargo, dan status pabrik.
           </p>
         </div>
+
+        {canManage && (
+          <button
+            onClick={handleCreate}
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold shadow-md shadow-amber-500/20 transition-all cursor-pointer self-start sm:self-auto shrink-0"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Tambah Transformer Baru</span>
+          </button>
+        )}
       </div>
 
       {/* Filter Bar */}
@@ -76,16 +116,38 @@ export default function TransformersPage() {
           const activeShipment = shipments.find((s) => s.transformerId === t.id);
 
           return (
-            <div key={t.id} className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs hover:shadow-md transition-all space-y-4">
+            <div key={t.id} className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs hover:shadow-md transition-all space-y-4 relative group">
               <div className="flex items-start justify-between">
                 <div>
                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Unit Transformer</span>
                   <h3 className="text-base font-black text-slate-900 tracking-tight">{t.transformerNumber}</h3>
                   <div className="text-xs font-mono font-bold text-blue-600 mt-0.5">{t.serialNumber}</div>
                 </div>
-                <span className="px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 text-xs font-bold border border-amber-200">
-                  {formatCapacity(t.capacityKVA)}
-                </span>
+
+                <div className="flex items-center gap-1.5">
+                  <span className="px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 text-xs font-bold border border-amber-200">
+                    {formatCapacity(t.capacityKVA)}
+                  </span>
+
+                  {canManage && (
+                    <div className="flex items-center gap-1 ml-1 border-l border-slate-200 pl-1.5">
+                      <button
+                        onClick={() => handleEdit(t)}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition-colors cursor-pointer"
+                        title="Edit Data Transformer"
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(t)}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                        title="Hapus Transformer"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-xs space-y-1.5">
@@ -132,6 +194,13 @@ export default function TransformersPage() {
           );
         })}
       </div>
+
+      {/* Transformer Modal */}
+      <TransformerModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        transformerToEdit={selectedTransformer}
+      />
     </div>
   );
 }

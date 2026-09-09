@@ -2,12 +2,20 @@
 
 import React, { useState } from 'react';
 import { useShipments } from '@/context/ShipmentContext';
-import { Building, Search, MapPin, Phone, Mail, User, Truck, ExternalLink } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import { Building, Search, MapPin, Phone, Mail, User, Truck, ExternalLink, Plus, Pencil, Trash2 } from 'lucide-react';
 import Link from 'next/link';
+import { Customer } from '@/types';
+import { CustomerModal } from '@/components/modals/CustomerModal';
 
 export default function CustomersPage() {
-  const { customers, shipments } = useShipments();
+  const { customers, shipments, deleteCustomer } = useShipments();
+  const { isSuperAdmin, isMarketing } = useAuth();
   const [search, setSearch] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+
+  const canManage = isSuperAdmin || isMarketing;
 
   const filtered = customers.filter(
     (c) =>
@@ -15,6 +23,22 @@ export default function CustomersPage() {
       c.city.toLowerCase().includes(search.toLowerCase()) ||
       c.customerPic.toLowerCase().includes(search.toLowerCase())
   );
+
+  const handleCreate = () => {
+    setSelectedCustomer(null);
+    setIsModalOpen(true);
+  };
+
+  const handleEdit = (customer: Customer) => {
+    setSelectedCustomer(customer);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = (customer: Customer) => {
+    if (confirm(`Apakah Anda yakin ingin menghapus data customer "${customer.companyName}"?`)) {
+      deleteCustomer(customer.id);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -29,6 +53,16 @@ export default function CustomersPage() {
             Daftar entitas pemesan trafo: PT PLN (Persero), BUMN Industri, Mining, dan Smelter di seluruh Indonesia.
           </p>
         </div>
+
+        {canManage && (
+          <button
+            onClick={handleCreate}
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/20 transition-all cursor-pointer self-start sm:self-auto shrink-0"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Tambah Customer Baru</span>
+          </button>
+        )}
       </div>
 
       {/* Search */}
@@ -54,7 +88,7 @@ export default function CustomersPage() {
           const customerShipments = shipments.filter((s) => s.customerId === c.id);
 
           return (
-            <div key={c.id} className="p-5 bg-white rounded-2xl border border-slate-200 shadow-xs hover:shadow-md transition-all space-y-4">
+            <div key={c.id} className="p-5 bg-white rounded-2xl border border-slate-200 shadow-xs hover:shadow-md transition-all space-y-4 relative group">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold shrink-0">
@@ -69,9 +103,30 @@ export default function CustomersPage() {
                   </div>
                 </div>
 
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-bold shrink-0">
-                  {customerShipments.length} Pengiriman
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-bold shrink-0">
+                    {customerShipments.length} Pengiriman
+                  </span>
+
+                  {canManage && (
+                    <div className="flex items-center gap-1 border-l border-slate-200 pl-2">
+                      <button
+                        onClick={() => handleEdit(c)}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"
+                        title="Edit Customer"
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(c)}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                        title="Hapus Customer"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-xs space-y-2">
@@ -101,6 +156,13 @@ export default function CustomersPage() {
           );
         })}
       </div>
+
+      {/* Customer Modal */}
+      <CustomerModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        customerToEdit={selectedCustomer}
+      />
     </div>
   );
 }

@@ -49,6 +49,22 @@ interface ShipmentContextType {
   reportIncident: (shipmentId: string, reason: string, actionTaken: string) => void;
   addPhoto: (shipmentId: string, photo: Omit<PhotoItem, 'id' | 'timestamp'>) => void;
   addDocument: (shipmentId: string, doc: Omit<DocumentItem, 'id' | 'uploadedAt'>) => void;
+  addCustomer: (data: Partial<Customer>) => Customer;
+  updateCustomer: (id: string, data: Partial<Customer>) => void;
+  deleteCustomer: (id: string) => void;
+
+  addTransformer: (data: Partial<Transformer>) => Transformer;
+  updateTransformer: (id: string, data: Partial<Transformer>) => void;
+  deleteTransformer: (id: string) => void;
+
+  addVehicle: (data: Partial<Vehicle>) => Vehicle;
+  updateVehicle: (id: string, data: Partial<Vehicle>) => void;
+  deleteVehicle: (id: string) => void;
+
+  addDriver: (data: Partial<Driver>) => Driver;
+  updateDriver: (id: string, data: Partial<Driver>) => void;
+  deleteDriver: (id: string) => void;
+
   markNotificationRead: (id: string) => void;
   getShipmentById: (id: string) => Shipment | undefined;
   resetToDefaultData: () => void;
@@ -61,8 +77,8 @@ export function ShipmentProvider({ children }: { children: React.ReactNode }) {
 
   const [shipments, setShipments] = useState<Shipment[]>(initialShipments);
   const [vendors, setVendors] = useState<ExpeditionVendor[]>(initialVendors);
-  const [customers] = useState<Customer[]>(initialCustomers);
-  const [transformers] = useState<Transformer[]>(initialTransformers);
+  const [customers, setCustomers] = useState<Customer[]>(initialCustomers);
+  const [transformers, setTransformers] = useState<Transformer[]>(initialTransformers);
   const [drivers, setDrivers] = useState<Driver[]>(initialDrivers);
   const [vehicles, setVehicles] = useState<Vehicle[]>(initialVehicles);
   const [notifications, setNotifications] = useState<NotificationItem[]>(initialNotifications);
@@ -73,6 +89,18 @@ export function ShipmentProvider({ children }: { children: React.ReactNode }) {
     try {
       const savedShipments = localStorage.getItem('trafo_shipments');
       if (savedShipments) setShipments(JSON.parse(savedShipments));
+
+      const savedCustomers = localStorage.getItem('trafo_customers');
+      if (savedCustomers) setCustomers(JSON.parse(savedCustomers));
+
+      const savedTransformers = localStorage.getItem('trafo_transformers');
+      if (savedTransformers) setTransformers(JSON.parse(savedTransformers));
+
+      const savedDrivers = localStorage.getItem('trafo_drivers');
+      if (savedDrivers) setDrivers(JSON.parse(savedDrivers));
+
+      const savedVehicles = localStorage.getItem('trafo_vehicles');
+      if (savedVehicles) setVehicles(JSON.parse(savedVehicles));
 
       const savedNotifications = localStorage.getItem('trafo_notifications');
       if (savedNotifications) setNotifications(JSON.parse(savedNotifications));
@@ -91,6 +119,42 @@ export function ShipmentProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem('trafo_shipments', JSON.stringify(updated));
     } catch (e) {
       console.error('Error saving shipments:', e);
+    }
+  };
+
+  const persistCustomers = (updated: Customer[]) => {
+    setCustomers(updated);
+    try {
+      localStorage.setItem('trafo_customers', JSON.stringify(updated));
+    } catch (e) {
+      console.error('Error saving customers:', e);
+    }
+  };
+
+  const persistTransformers = (updated: Transformer[]) => {
+    setTransformers(updated);
+    try {
+      localStorage.setItem('trafo_transformers', JSON.stringify(updated));
+    } catch (e) {
+      console.error('Error saving transformers:', e);
+    }
+  };
+
+  const persistDrivers = (updated: Driver[]) => {
+    setDrivers(updated);
+    try {
+      localStorage.setItem('trafo_drivers', JSON.stringify(updated));
+    } catch (e) {
+      console.error('Error saving drivers:', e);
+    }
+  };
+
+  const persistVehicles = (updated: Vehicle[]) => {
+    setVehicles(updated);
+    try {
+      localStorage.setItem('trafo_vehicles', JSON.stringify(updated));
+    } catch (e) {
+      console.error('Error saving vehicles:', e);
     }
   };
 
@@ -489,11 +553,169 @@ export function ShipmentProvider({ children }: { children: React.ReactNode }) {
     return shipments.find((s) => s.id === id);
   };
 
+  // Customer CRUD
+  const addCustomer = (data: Partial<Customer>): Customer => {
+    const newId = data.id || `CUST-${String(customers.length + 1).padStart(3, '0')}`;
+    const newCustomer: Customer = {
+      id: newId,
+      companyName: data.companyName || 'Customer Baru',
+      customerPic: data.customerPic || 'PIC Baru',
+      phone: data.phone || '021-000000',
+      email: data.email || 'info@customer.co.id',
+      address: data.address || 'Alamat Customer',
+      city: data.city || 'Jakarta',
+      province: data.province || 'DKI Jakarta',
+      postalCode: data.postalCode || '10000',
+      latitude: data.latitude ?? -6.2088,
+      longitude: data.longitude ?? 106.8456,
+      ...data,
+    };
+    const updated = [newCustomer, ...customers];
+    persistCustomers(updated);
+    addLog(`Menambahkan Customer Baru: ${newCustomer.companyName}`, `${newCustomer.city}, ${newCustomer.province}`);
+    return newCustomer;
+  };
+
+  const updateCustomer = (id: string, data: Partial<Customer>) => {
+    const updated = customers.map((c) => (c.id === id ? { ...c, ...data } : c));
+    persistCustomers(updated);
+    const target = updated.find((c) => c.id === id);
+    addLog(`Memperbarui data Customer: ${target?.companyName || id}`, target?.customerPic);
+  };
+
+  const deleteCustomer = (id: string) => {
+    const target = customers.find((c) => c.id === id);
+    const updated = customers.filter((c) => c.id !== id);
+    persistCustomers(updated);
+    if (target) {
+      addLog(`Menghapus Customer: ${target.companyName}`, `ID: ${id}`);
+    }
+  };
+
+  // Transformer CRUD
+  const addTransformer = (data: Partial<Transformer>): Transformer => {
+    const newId = data.id || `TRF-${data.capacityKVA || 2500}-${String(transformers.length + 1).padStart(3, '0')}`;
+    const newTransformer: Transformer = {
+      id: newId,
+      transformerNumber: data.transformerNumber || `TRF-${data.capacityKVA || 2500}-${String(transformers.length + 1).padStart(3, '0')}`,
+      serialNumber: data.serialNumber || `SN-2026-XF${Math.floor(1000 + Math.random() * 9000)}`,
+      type: data.type || 'Step-Down Substation Transformer',
+      capacityKVA: data.capacityKVA || 2500,
+      weightKg: data.weightKg || 38000,
+      dimensions: data.dimensions || { length: 4800, width: 2800, height: 3600 },
+      oilType: data.oilType || 'Mineral Oil Nytro Lyra X',
+      voltageRating: data.voltageRating || '150 kV / 20 kV',
+      productionCompletionDate: data.productionCompletionDate || new Date().toISOString().split('T')[0],
+      coolingType: data.coolingType || 'ONAN',
+      ...data,
+    };
+    const updated = [newTransformer, ...transformers];
+    persistTransformers(updated);
+    addLog(`Menambahkan Transformer baru: ${newTransformer.transformerNumber}`, `${newTransformer.capacityKVA} kVA - ${newTransformer.serialNumber}`);
+    return newTransformer;
+  };
+
+  const updateTransformer = (id: string, data: Partial<Transformer>) => {
+    const updated = transformers.map((t) => (t.id === id ? { ...t, ...data } : t));
+    persistTransformers(updated);
+    const target = updated.find((t) => t.id === id);
+    addLog(`Memperbarui data Transformer: ${target?.transformerNumber || id}`, target?.serialNumber);
+  };
+
+  const deleteTransformer = (id: string) => {
+    const target = transformers.find((t) => t.id === id);
+    const updated = transformers.filter((t) => t.id !== id);
+    persistTransformers(updated);
+    if (target) {
+      addLog(`Menghapus Transformer: ${target.transformerNumber}`, `SN: ${target.serialNumber}`);
+    }
+  };
+
+  // Vehicle CRUD
+  const addVehicle = (data: Partial<Vehicle>): Vehicle => {
+    const newId = data.id || `veh-${Date.now().toString().slice(-4)}`;
+    const newVehicle: Vehicle = {
+      id: newId,
+      vendorId: data.vendorId || vendors[0]?.id || 'VND-001',
+      plateNumber: data.plateNumber || 'B 9000 UXX',
+      type: data.type || 'Tronton Lowbed',
+      brand: data.brand || 'Volvo',
+      model: data.model || 'FH16 750',
+      capacityTons: data.capacityTons || 60,
+      dimensions: data.dimensions || { length: 16.5, width: 3.2, height: 1.1 },
+      gpsId: data.gpsId || `GPS-TRK-${Math.floor(100 + Math.random() * 900)}`,
+      status: data.status || 'Ready',
+      ...data,
+    };
+    const updated = [newVehicle, ...vehicles];
+    persistVehicles(updated);
+    addLog(`Menambahkan Armada Truk: ${newVehicle.plateNumber}`, `${newVehicle.brand} ${newVehicle.model}`);
+    return newVehicle;
+  };
+
+  const updateVehicle = (id: string, data: Partial<Vehicle>) => {
+    const updated = vehicles.map((v) => (v.id === id ? { ...v, ...data } : v));
+    persistVehicles(updated);
+    const target = updated.find((v) => v.id === id);
+    addLog(`Memperbarui data Armada: ${target?.plateNumber || id}`, target?.status);
+  };
+
+  const deleteVehicle = (id: string) => {
+    const target = vehicles.find((v) => v.id === id);
+    const updated = vehicles.filter((v) => v.id !== id);
+    persistVehicles(updated);
+    if (target) {
+      addLog(`Menghapus Armada Truk: ${target.plateNumber}`, target.model);
+    }
+  };
+
+  // Driver CRUD
+  const addDriver = (data: Partial<Driver>): Driver => {
+    const newId = data.id || `drv-${Date.now().toString().slice(-4)}`;
+    const newDriver: Driver = {
+      id: newId,
+      vendorId: data.vendorId || vendors[0]?.id || 'VND-001',
+      name: data.name || 'Pengemudi Baru',
+      phone: data.phone || '0812-0000-0000',
+      simNumber: data.simNumber || `SIM-BII-${Math.floor(100000 + Math.random() * 900000)}`,
+      simType: data.simType || 'BII Umum',
+      emergencyContact: data.emergencyContact || 'Keluarga: 0812-9999-9999',
+      status: data.status || 'Available',
+      ...data,
+    };
+    const updated = [newDriver, ...drivers];
+    persistDrivers(updated);
+    addLog(`Mendaftarkan Pengemudi baru: ${newDriver.name}`, `${newDriver.simType} - ${newDriver.simNumber}`);
+    return newDriver;
+  };
+
+  const updateDriver = (id: string, data: Partial<Driver>) => {
+    const updated = drivers.map((d) => (d.id === id ? { ...d, ...data } : d));
+    persistDrivers(updated);
+    const target = updated.find((d) => d.id === id);
+    addLog(`Memperbarui data Pengemudi: ${target?.name || id}`, target?.status);
+  };
+
+  const deleteDriver = (id: string) => {
+    const target = drivers.find((d) => d.id === id);
+    const updated = drivers.filter((d) => d.id !== id);
+    persistDrivers(updated);
+    if (target) {
+      addLog(`Menghapus data Pengemudi: ${target.name}`, `ID: ${id}`);
+    }
+  };
+
   const resetToDefaultData = () => {
     localStorage.removeItem('trafo_shipments');
+    localStorage.removeItem('trafo_customers');
+    localStorage.removeItem('trafo_transformers');
+    localStorage.removeItem('trafo_drivers');
+    localStorage.removeItem('trafo_vehicles');
     localStorage.removeItem('trafo_notifications');
     localStorage.removeItem('trafo_activity_logs');
     setShipments(initialShipments);
+    setCustomers(initialCustomers);
+    setTransformers(initialTransformers);
     setNotifications(initialNotifications);
     setActivityLogs(initialActivityLogs);
     setVendors(initialVendors);
@@ -522,6 +744,18 @@ export function ShipmentProvider({ children }: { children: React.ReactNode }) {
         reportIncident,
         addPhoto,
         addDocument,
+        addCustomer,
+        updateCustomer,
+        deleteCustomer,
+        addTransformer,
+        updateTransformer,
+        deleteTransformer,
+        addVehicle,
+        updateVehicle,
+        deleteVehicle,
+        addDriver,
+        updateDriver,
+        deleteDriver,
         markNotificationRead,
         getShipmentById,
         resetToDefaultData,
