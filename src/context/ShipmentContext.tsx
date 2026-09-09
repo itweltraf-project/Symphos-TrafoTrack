@@ -88,7 +88,24 @@ export function ShipmentProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     try {
       const savedShipments = localStorage.getItem('trafo_shipments');
-      if (savedShipments) setShipments(JSON.parse(savedShipments));
+      if (savedShipments) {
+        const parsed: Shipment[] = JSON.parse(savedShipments);
+        // Auto-migrate legacy origin addresses if any
+        const migrated = parsed.map((s) => {
+          if (s.originAddress?.includes('Delta Silicon') || s.originAddress?.includes('Cikarang')) {
+            return {
+              ...s,
+              originCity: 'Tangerang',
+              originAddress: 'Jl. Agarindo No.10, Bunder, Kec. Cikupa, Kabupaten Tangerang, Banten 15560',
+            };
+          }
+          return s;
+        });
+        setShipments(migrated);
+        localStorage.setItem('trafo_shipments', JSON.stringify(migrated));
+      } else {
+        setShipments(initialShipments);
+      }
 
       const savedCustomers = localStorage.getItem('trafo_customers');
       if (savedCustomers) setCustomers(JSON.parse(savedCustomers));
@@ -223,16 +240,16 @@ export function ShipmentProvider({ children }: { children: React.ReactNode }) {
       currentStatus: 'SHIPMENT_CREATED',
       shipmentDate: data.shipmentDate || new Date().toISOString().split('T')[0],
       expectedDeliveryDate: data.expectedDeliveryDate || '2026-09-08 17:00',
-      originCity: data.originCity || 'Cikarang Factory',
-      originAddress: data.originAddress || 'Pabrik Trafo Heavy Electrical, Delta Silicon 6, Cikarang',
+      originCity: data.originCity || 'Tangerang',
+      originAddress: data.originAddress || 'Jl. Agarindo No.10, Bunder, Kec. Cikupa, Kabupaten Tangerang, Banten 15560',
       destinationCity: selectedCustomer.city,
       destinationAddress: selectedCustomer.address,
       currentLocation: {
-        city: 'Cikarang Factory',
-        province: 'Jawa Barat',
-        landmark: 'Factory Loading Yard',
-        lat: -6.3121,
-        lng: 107.1352,
+        city: 'Tangerang',
+        province: 'Banten',
+        landmark: 'Pabrik Cikupa Loading Yard',
+        lat: -6.2366,
+        lng: 106.5085,
         lastUpdatedAt: new Date().toISOString().replace('T', ' ').substring(0, 16),
       },
       distanceKm: data.distanceKm || 120,

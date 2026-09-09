@@ -23,8 +23,8 @@ export function CreateShipmentModal({ isOpen, onClose }: CreateShipmentModalProp
     customerId: customers[0]?.id || '',
     vendorId: vendors[0]?.id || '',
     shippingMethod: 'Tronton Lowbed Heavy Haul',
-    originCity: 'Cikarang Factory Hub',
-    originAddress: 'Pabrik Trafo Heavy Electrical, Delta Silicon 6, Cikarang',
+    originCity: 'Tangerang',
+    originAddress: 'Jl. Agarindo No.10, Bunder, Kec. Cikupa, Kabupaten Tangerang, Banten 15560',
     notes: '',
   });
 

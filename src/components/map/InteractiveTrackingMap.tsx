@@ -171,9 +171,9 @@ export function InteractiveTrackingMap({
 
     if (shipments.length === 0) return;
 
-    // Factory Origin Coordinates (Cikarang Heavy Electrical Hub)
-    const factoryLat = -6.3121;
-    const factoryLng = 107.1352;
+    // Factory Origin Coordinates (Jl. Agarindo No.10, Bunder, Kec. Cikupa, Kabupaten Tangerang, Banten 15560)
+    const factoryLat = -6.2366;
+    const factoryLng = 106.5085;
 
     // Render Origin Marker (Factory Hub)
     const originIcon = L.divIcon({
@@ -187,23 +187,23 @@ export function InteractiveTrackingMap({
             </div>
           </div>
           <div class="px-2 py-0.5 rounded-md bg-slate-900/90 text-white text-[10px] font-bold shadow-md whitespace-nowrap border border-slate-700">
-            Pabrik Trafo Cikarang
+            Pabrik Trafo Cikupa (Tangerang)
           </div>
         </div>
       `,
-      iconSize: [140, 32],
+      iconSize: [160, 32],
       iconAnchor: [14, 16],
     });
 
     const originMarker = L.marker([factoryLat, factoryLng], { icon: originIcon });
     originMarker.bindPopup(`
-      <div class="p-2.5 font-sans text-xs min-w-[200px]">
+      <div class="p-2.5 font-sans text-xs min-w-[220px]">
         <div class="font-bold text-slate-900 flex items-center gap-1.5 text-sm mb-1">
           <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
           Main Transformer Plant (Origin)
         </div>
         <p class="text-slate-600 text-[11px] leading-relaxed">
-          Pusat Fabrikasi & Pengujian Trafo Daya Tinggi, Delta Silicon 6, Cikarang.
+          Jl. Agarindo No.10, Bunder, Kec. Cikupa, Kabupaten Tangerang, Banten 15560
         </p>
       </div>
     `);

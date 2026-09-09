@@ -57,7 +57,7 @@ export default function SettingsPage() {
               <label className="block font-bold text-slate-700 mb-1">Lokasi Pabrik Utama (Hub Outbound)</label>
               <input
                 type="text"
-                defaultValue="Kawasan Industri GIIC Delta Silicon 6, Cikarang Pusat, Bekasi"
+                defaultValue="Jl. Agarindo No.10, Bunder, Kec. Cikupa, Kabupaten Tangerang, Banten 15560"
                 className="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-600"
                 readOnly
               />
