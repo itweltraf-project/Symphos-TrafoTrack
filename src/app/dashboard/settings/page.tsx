@@ -7,7 +7,7 @@ import { Settings, Shield, Bell, Zap, Save, RotateCcw, Check } from 'lucide-reac
 export default function SettingsPage() {
   const { resetToDefaultData } = useShipments();
 
-  const [companyName, setCompanyName] = useState('PT Trafo Manufacturing & Logistics Nusantara');
+  const [companyName, setCompanyName] = useState('PT. SYMPHOS ELECTRIC');
   const [delayThresholdMinutes, setDelayThresholdMinutes] = useState('30');
   const [gpsPingMinutes, setGpsPingMinutes] = useState('15');
   const [enableWhatsappAlerts, setEnableWhatsappAlerts] = useState(true);
@@ -54,11 +54,21 @@ export default function SettingsPage() {
             </div>
 
             <div>
-              <label className="block font-bold text-slate-700 mb-1">Lokasi Pabrik Utama (Hub Outbound)</label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block font-bold text-slate-700">Pusat Pengiriman (Origin Hub)</label>
+                <a
+                  href="https://maps.app.goo.gl/Yq1xrZhYD8u9wf5c6"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-700 font-bold text-[11px] inline-flex items-center gap-0.5"
+                >
+                  Google Maps ↗
+                </a>
+              </div>
               <input
                 type="text"
-                defaultValue="Jl. Agarindo No.10, Bunder, Kec. Cikupa, Kabupaten Tangerang, Banten 15560"
-                className="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-600"
+                defaultValue="PT. SYMPHOS ELECTRIC, Jl. Raya Agarindo No. 10, Kel. Bunder, Kec. Cikupa, Kabupaten Tangerang, Banten 15710"
+                className="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 font-medium"
                 readOnly
               />
             </div>

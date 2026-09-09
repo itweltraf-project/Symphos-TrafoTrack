@@ -171,9 +171,9 @@ export function InteractiveTrackingMap({
 
     if (shipments.length === 0) return;
 
-    // Factory Origin Coordinates (Jl. Agarindo No.10, Bunder, Kec. Cikupa, Kabupaten Tangerang, Banten 15560)
-    const factoryLat = -6.2366;
-    const factoryLng = 106.5085;
+    // Factory Origin Coordinates (PT. SYMPHOS ELECTRIC: https://maps.app.goo.gl/Yq1xrZhYD8u9wf5c6)
+    const factoryLat = -6.1837769;
+    const factoryLng = 106.548519;
 
     // Render Origin Marker (Factory Hub)
     const originIcon = L.divIcon({
@@ -187,24 +187,33 @@ export function InteractiveTrackingMap({
             </div>
           </div>
           <div class="px-2 py-0.5 rounded-md bg-slate-900/90 text-white text-[10px] font-bold shadow-md whitespace-nowrap border border-slate-700">
-            Pabrik Trafo Cikupa (Tangerang)
+            PT. SYMPHOS ELECTRIC (Pusat Pengiriman)
           </div>
         </div>
       `,
-      iconSize: [160, 32],
+      iconSize: [180, 32],
       iconAnchor: [14, 16],
     });
 
     const originMarker = L.marker([factoryLat, factoryLng], { icon: originIcon });
     originMarker.bindPopup(`
-      <div class="p-2.5 font-sans text-xs min-w-[220px]">
+      <div class="p-2.5 font-sans text-xs min-w-[240px]">
         <div class="font-bold text-slate-900 flex items-center gap-1.5 text-sm mb-1">
           <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-          Main Transformer Plant (Origin)
+          PT. SYMPHOS ELECTRIC
         </div>
-        <p class="text-slate-600 text-[11px] leading-relaxed">
-          Jl. Agarindo No.10, Bunder, Kec. Cikupa, Kabupaten Tangerang, Banten 15560
+        <div class="text-[10px] font-bold text-emerald-700 uppercase tracking-wider mb-1">Pusat Pengiriman / Hub Pabrik Utama</div>
+        <p class="text-slate-600 text-[11px] leading-relaxed mb-2">
+          Jl. Raya Agarindo No. 10, Kel. Bunder, Kec. Cikupa, Kabupaten Tangerang, Banten 15710
         </p>
+        <a 
+          href="https://maps.app.goo.gl/Yq1xrZhYD8u9wf5c6" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          class="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 hover:text-blue-700 hover:underline"
+        >
+          Buka di Google Maps ↗
+        </a>
       </div>
     `);
     group.addLayer(originMarker);

@@ -90,16 +90,27 @@ export function ShipmentProvider({ children }: { children: React.ReactNode }) {
       const savedShipments = localStorage.getItem('trafo_shipments');
       if (savedShipments) {
         const parsed: Shipment[] = JSON.parse(savedShipments);
-        // Auto-migrate legacy origin addresses if any
+        // Auto-migrate legacy origin addresses & coordinates to PT. SYMPHOS ELECTRIC
         const migrated = parsed.map((s) => {
-          if (s.originAddress?.includes('Delta Silicon') || s.originAddress?.includes('Cikarang')) {
-            return {
-              ...s,
-              originCity: 'Tangerang',
-              originAddress: 'Jl. Agarindo No.10, Bunder, Kec. Cikupa, Kabupaten Tangerang, Banten 15560',
+          let updated = { ...s };
+          if (
+            s.originAddress?.includes('Delta Silicon') ||
+            s.originAddress?.includes('Cikarang') ||
+            s.originAddress?.includes('15560') ||
+            !s.originAddress?.includes('SYMPHOS')
+          ) {
+            updated.originCity = 'Tangerang';
+            updated.originAddress = 'PT. SYMPHOS ELECTRIC, Jl. Raya Agarindo No. 10, Kel. Bunder, Kec. Cikupa, Kabupaten Tangerang, Banten 15710';
+          }
+          if (s.currentLocation?.lat === -6.2366 && s.currentLocation?.lng === 106.5085) {
+            updated.currentLocation = {
+              ...s.currentLocation,
+              lat: -6.1837769,
+              lng: 106.548519,
+              landmark: 'Pabrik PT. SYMPHOS ELECTRIC Loading Yard',
             };
           }
-          return s;
+          return updated;
         });
         setShipments(migrated);
         localStorage.setItem('trafo_shipments', JSON.stringify(migrated));
@@ -241,15 +252,15 @@ export function ShipmentProvider({ children }: { children: React.ReactNode }) {
       shipmentDate: data.shipmentDate || new Date().toISOString().split('T')[0],
       expectedDeliveryDate: data.expectedDeliveryDate || '2026-09-08 17:00',
       originCity: data.originCity || 'Tangerang',
-      originAddress: data.originAddress || 'Jl. Agarindo No.10, Bunder, Kec. Cikupa, Kabupaten Tangerang, Banten 15560',
+      originAddress: data.originAddress || 'PT. SYMPHOS ELECTRIC, Jl. Raya Agarindo No. 10, Kel. Bunder, Kec. Cikupa, Kabupaten Tangerang, Banten 15710',
       destinationCity: selectedCustomer.city,
       destinationAddress: selectedCustomer.address,
       currentLocation: {
         city: 'Tangerang',
         province: 'Banten',
-        landmark: 'Pabrik Cikupa Loading Yard',
-        lat: -6.2366,
-        lng: 106.5085,
+        landmark: 'Pabrik PT. SYMPHOS ELECTRIC Loading Yard',
+        lat: -6.1837769,
+        lng: 106.548519,
         lastUpdatedAt: new Date().toISOString().replace('T', ' ').substring(0, 16),
       },
       distanceKm: data.distanceKm || 120,

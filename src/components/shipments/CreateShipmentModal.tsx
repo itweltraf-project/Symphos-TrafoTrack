@@ -24,7 +24,7 @@ export function CreateShipmentModal({ isOpen, onClose }: CreateShipmentModalProp
     vendorId: vendors[0]?.id || '',
     shippingMethod: 'Tronton Lowbed Heavy Haul',
     originCity: 'Tangerang',
-    originAddress: 'Jl. Agarindo No.10, Bunder, Kec. Cikupa, Kabupaten Tangerang, Banten 15560',
+    originAddress: 'PT. SYMPHOS ELECTRIC, Jl. Raya Agarindo No. 10, Kel. Bunder, Kec. Cikupa, Kabupaten Tangerang, Banten 15710',
     notes: '',
   });
 
