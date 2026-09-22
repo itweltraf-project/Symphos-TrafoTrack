@@ -8,6 +8,8 @@ interface AuthContextType {
   currentUser: User;
   switchUser: (userId: string) => void;
   switchRole: (role: UserRole, vendorId?: string) => void;
+  login: (username: string, password: string) => { success: boolean; message?: string; user?: User };
+  logout: () => void;
   isSuperAdmin: boolean;
   isMarketing: boolean;
   isVendor: boolean;
@@ -57,6 +59,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const login = (usernameInput: string, passwordInput: string): { success: boolean; message?: string; user?: User } => {
+    const trimmedUser = usernameInput.trim().toLowerCase();
+    const trimmedPass = passwordInput.trim();
+
+    if (!trimmedUser || !trimmedPass) {
+      return { success: false, message: 'Username dan kata sandi wajib diisi.' };
+    }
+
+    const found = initialUsers.find((u) => {
+      const matchUsername =
+        (u.username && u.username.toLowerCase() === trimmedUser) ||
+        u.email.toLowerCase() === trimmedUser ||
+        u.name.toLowerCase() === trimmedUser;
+
+      if (!matchUsername) return false;
+
+      const userPassword = u.password || '123456';
+      return userPassword.toLowerCase() === trimmedPass.toLowerCase();
+    });
+
+    if (found) {
+      setCurrentUser(found);
+      localStorage.setItem('active_user_id', found.id);
+      return { success: true, user: found };
+    }
+
+    return {
+      success: false,
+      message: 'Username atau kata sandi tidak valid. Silakan periksa kembali.',
+    };
+  };
+
+  const logout = () => {
+    localStorage.removeItem('active_user_id');
+  };
+
   const isSuperAdmin = currentUser.role === 'SUPER_ADMIN';
   const isMarketing = currentUser.role === 'MARKETING';
   const isVendor = currentUser.role === 'VENDOR';
@@ -71,6 +109,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         currentUser,
         switchUser,
         switchRole,
+        login,
+        logout,
         isSuperAdmin,
         isMarketing,
         isVendor,

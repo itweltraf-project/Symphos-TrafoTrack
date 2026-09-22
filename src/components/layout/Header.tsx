@@ -17,6 +17,7 @@ import {
   AlertTriangle,
   X,
   ExternalLink,
+  LogOut,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -25,7 +26,7 @@ interface HeaderProps {
 }
 
 export function Header({ onOpenCreateShipment }: HeaderProps) {
-  const { currentUser, switchUser, allUsers, allVendors, isVendor, isSuperAdmin, isMarketing } = useAuth();
+  const { currentUser, switchUser, allUsers, allVendors, isVendor, isSuperAdmin, isMarketing, logout } = useAuth();
   const { notifications, markNotificationRead, shipments } = useShipments();
 
   const [showRoleModal, setShowRoleModal] = useState(false);
@@ -227,6 +228,19 @@ export function Header({ onOpenCreateShipment }: HeaderProps) {
                       </button>
                     );
                   })}
+              </div>
+
+              <div className="pt-2 mt-1 border-t border-slate-100">
+                <button
+                  onClick={() => {
+                    logout();
+                    window.location.href = '/';
+                  }}
+                  className="w-full flex items-center justify-center gap-2 p-2 rounded-lg text-xs font-semibold text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Keluar dari Akun (Logout)</span>
+                </button>
               </div>
             </div>
           )}

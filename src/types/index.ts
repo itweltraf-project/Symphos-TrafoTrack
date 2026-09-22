@@ -3,6 +3,8 @@ export type UserRole = 'SUPER_ADMIN' | 'MARKETING' | 'VENDOR';
 export interface User {
   id: string;
   name: string;
+  username?: string;
+  password?: string;
   email: string;
   role: UserRole;
   vendorId?: string;

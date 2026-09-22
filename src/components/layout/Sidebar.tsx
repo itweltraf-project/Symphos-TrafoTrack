@@ -23,11 +23,12 @@ import {
   CheckCircle2,
   AlertTriangle,
   FolderLock,
+  LogOut,
 } from 'lucide-react';
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { currentUser, isVendor, isSuperAdmin, currentVendor } = useAuth();
+  const { currentUser, isVendor, isSuperAdmin, currentVendor, logout } = useAuth();
   const { shipments, resetToDefaultData } = useShipments();
   const [collapsed, setCollapsed] = useState(false);
 
@@ -214,18 +215,30 @@ export function Sidebar() {
           )}
 
           {!collapsed && (
-            <button
-              onClick={() => {
-                if (confirm('Reset semua data demo ke kondisi awal pabrik?')) {
-                  resetToDefaultData();
-                  alert('Data berhasil di-reset!');
-                }
-              }}
-              title="Reset Demo Data"
-              className="p-1.5 rounded-lg text-slate-400 hover:text-amber-400 hover:bg-slate-800 transition-colors shrink-0"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-            </button>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => {
+                  if (confirm('Reset semua data demo ke kondisi awal pabrik?')) {
+                    resetToDefaultData();
+                    alert('Data berhasil di-reset!');
+                  }
+                }}
+                title="Reset Demo Data"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-amber-400 hover:bg-slate-800 transition-colors shrink-0 cursor-pointer"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => {
+                  logout();
+                  window.location.href = '/';
+                }}
+                title="Keluar (Logout)"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-slate-800 transition-colors shrink-0 cursor-pointer"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+              </button>
+            </div>
           )}
         </div>
       </div>

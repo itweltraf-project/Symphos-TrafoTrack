@@ -14,6 +14,8 @@ export const initialUsers: User[] = [
   {
     id: 'usr-admin-01',
     name: 'Jodi Setiawan',
+    username: 'JODI',
+    password: 'GARMIN',
     email: 'jodi.setiawan@trafo-mkt.co.id',
     role: 'SUPER_ADMIN',
     department: 'Central Logistics & Supply Chain',
