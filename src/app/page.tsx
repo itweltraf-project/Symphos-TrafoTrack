@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import {
-  Zap,
+  Truck,
   ArrowRight,
   Lock,
   User,
@@ -50,8 +50,8 @@ export default function LoginPage() {
       {/* Top Navbar */}
       <header className="px-6 lg:px-12 py-5 flex items-center justify-between border-b border-slate-800/80 bg-slate-900/40 backdrop-blur-md relative z-10">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 via-orange-500 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-amber-500/20">
-            <Zap className="w-5 h-5 fill-current" />
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 via-blue-700 to-slate-800 flex items-center justify-center text-white shadow-lg shadow-blue-600/30">
+            <Truck className="w-5 h-5" />
           </div>
           <div>
             <div className="font-bold text-white tracking-tight text-lg leading-none">

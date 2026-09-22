@@ -82,8 +82,8 @@ export function Sidebar() {
         <div className="h-16 flex items-center justify-between px-4 border-b border-slate-800/80 bg-slate-950/40">
           {!collapsed ? (
             <Link href="/dashboard" className="flex items-center gap-3 group">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 via-orange-500 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-amber-500/20 group-hover:scale-105 transition-transform">
-                <Zap className="w-5 h-5 fill-current" />
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 via-blue-700 to-slate-800 flex items-center justify-center text-white shadow-lg shadow-blue-600/20 group-hover:scale-105 transition-transform">
+                <Truck className="w-5 h-5" />
               </div>
               <div>
                 <div className="font-bold text-white tracking-tight leading-none text-base">TRAFO TRACK</div>
@@ -91,8 +91,8 @@ export function Sidebar() {
               </div>
             </Link>
           ) : (
-            <div className="w-10 h-10 mx-auto rounded-xl bg-gradient-to-br from-amber-500 to-blue-600 flex items-center justify-center text-white">
-              <Zap className="w-5 h-5 fill-current" />
+            <div className="w-10 h-10 mx-auto rounded-xl bg-gradient-to-br from-blue-600 to-slate-800 flex items-center justify-center text-white">
+              <Truck className="w-5 h-5" />
             </div>
           )}
 
